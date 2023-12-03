@@ -28,7 +28,8 @@ replace_words(Line, RemainingNumbers) ->
 	 ).
 
 cal_value(List) ->
-	first_int(List) * 10 + first_int(string:reverse(List)).
+	ReplacedList = replace_words(List),
+	first_int(ReplacedList) * 10 + first_int(string:reverse(ReplacedList)).
 
 first_int(List) ->
 	[H|T] = List,
@@ -41,7 +42,7 @@ first_int(List) ->
 cal_value_sum(Device, Acc) ->
 	case io:get_line(Device, "") of
 		eof -> Acc;
-		Line -> cal_value_sum(Device, Acc+cal_value(replace_words(Line)))
+		Line -> cal_value_sum(Device, Acc+cal_value(Line))
 	end.
 
 cal_value_sum_from_file(Path) ->
