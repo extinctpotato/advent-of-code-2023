@@ -24,9 +24,11 @@ replace_words(Line, []) ->
 
 replace_words(Line, RemainingNumbers) ->
 	[Pair|Tail] = RemainingNumbers,
-	{SearchPattern, Replacement} = Pair,
+	{Word, Int} = Pair,
+	[FirstLetter|_] = Word,
+	[LastLetter|_] = string:reverse(Word),
 	replace_words(
-	  string:replace(Line, SearchPattern, Replacement, all), Tail
+	  string:replace(Line, Word, [FirstLetter, Int, LastLetter], all), Tail
 	 ).
 
 % Calculate the calibration value by taking the first and the last digit
