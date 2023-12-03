@@ -15,6 +15,7 @@ numbers() ->
         {"nine", "9"}
     ].
 
+% Replace numbers written as English words to integers.
 replace_words(Line) ->
 	replace_words(Line, numbers()).
 
@@ -28,10 +29,13 @@ replace_words(Line, RemainingNumbers) ->
 	  string:replace(Line, SearchPattern, Replacement, all), Tail
 	 ).
 
+% Calculate the calibration value by taking the first and the last digit
+% and combining them into a base-10 integer.
 cal_value(List) ->
 	ReplacedList = replace_words(List),
 	first_int(ReplacedList) * 10 + first_int(string:reverse(ReplacedList)).
 
+% Returns the first digit found in the string.
 first_int(List) ->
 	[H|T] = List,
 	case string:to_integer([H]) of
@@ -40,6 +44,8 @@ first_int(List) ->
 		{Int, []} -> Int
 	end.
 
+% Given an IO device, it iterates over it line by line 
+% and calculates the sum of calibration values.
 cal_value_sum(Device, Acc) ->
 	case io:get_line(Device, "") of
 		eof -> Acc;
