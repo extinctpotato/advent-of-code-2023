@@ -1,5 +1,6 @@
 -module(solution).
 -export([cal_value_sum_from_file/1, cal_value/1, replace_words/1]).
+-include_lib("eunit/include/eunit.hrl").
 
 numbers() ->
     [
@@ -48,3 +49,14 @@ cal_value_sum(Device, Acc) ->
 cal_value_sum_from_file(Path) ->
 	{_, Device} = file:open(Path, [read]),
 	cal_value_sum(Device, 0).
+
+%%% Tests
+cal_value_test_() ->
+	[?_assert(cal_value("two1nine") =:= 29),
+	 ?_assert(cal_value("eightwothree") =:= 83),
+	 ?_assert(cal_value("abcone2threexyz") =:= 13),
+	 ?_assert(cal_value("xtwone3four") =:= 24),
+	 ?_assert(cal_value("4nineeightseven2") =:= 42),
+	 ?_assert(cal_value("zoneight234") =:= 14),
+	 ?_assert(cal_value("7pqrstsixteen") =:= 76)
+	].
