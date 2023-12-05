@@ -65,17 +65,17 @@ parse_line(Line) ->
 	[GameL|Tail] = string:split(Line, ": "),
 	Game = list_to_integer(lists:last(string:split(GameL, "Game "))),
 	Sets = parse_sets(Tail),
-	{Game, Sets}.
+	case possible_sets(Sets) of
+		false -> 0;
+		true -> Game
+	end.
 
-%process_lines(Device) ->
-%	case io:get_line(Device, "") of
-%		eof -> smth();
-%		Line -> smth_else()
-%	end.
-
-process_lines(Device) ->
-	[].
+process_lines(Device, Acc) ->
+	case io:get_line(Device, "") of
+		eof -> Acc;
+		Line -> process_lines(Device, Acc+parse_line(string:chomp(Line)))
+	end.
 
 process_file(Path) ->
 	{_, Device} = file:open(Path, [read]),
-	process_lines(Device).
+	process_lines(Device, 0).
