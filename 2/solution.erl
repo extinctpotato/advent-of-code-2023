@@ -2,6 +2,17 @@
 -compile(export_all).
 -include_lib("eunit/include/eunit.hrl").
 
+possible_sets([]) ->
+	true;
+
+possible_sets(Sets) ->
+	[Set|OtherSets] = Sets,
+	case possible_set(Set) of
+		false -> false;
+		true ->
+			possible_sets(OtherSets)
+	end.
+
 possible_set([]) ->
 	true;
 
