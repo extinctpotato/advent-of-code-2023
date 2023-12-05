@@ -2,17 +2,25 @@
 -compile(export_all).
 -include_lib("eunit/include/eunit.hrl").
 
-possible_set(Red, Green, Blue, TotalRed, TotalGreen, TotalBlue) ->
-	(Red >= TotalRed) and (Green >= TotalGreen) and (Blue >= TotalBlue).
+possible_set([]) ->
+	true;
+
+possible_set(TokenizedSet) ->
+	[Tokens|Rest] = TokenizedSet,
+	case enough_balls(Tokens) of
+		false -> false;
+		true ->
+			possible_set(Rest)
+	end.
 
 enough_balls({X, blue}) ->
-	X >= 14;
+	X =< 14;
 
 enough_balls({X, green}) ->
-	X >= 13;
+	X =< 13;
 
 enough_balls({X, red}) ->
-	X >= 12.
+	X =< 12.
 
 parse_token(Token) ->
 	[Count, Color] = string:split(Token, " "),
