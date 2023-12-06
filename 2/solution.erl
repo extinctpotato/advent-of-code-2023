@@ -74,6 +74,29 @@ game_value(ParsedLine) ->
 		true -> Game
 	end.
 
+game_value2(ParsedLine) ->
+	{_, Sets} = ParsedLine,
+	AllBalls = lists:flatten(Sets),
+	MaxSets = [M || {M,_} <- find_max_balls(AllBalls, [])],
+	lists:foldl(fun(X, Prod) -> X * Prod end, 1, MaxSets).
+
+find_max_balls(Balls, []) ->
+	find_max_balls(Balls, [{0,red},{0,green},{0,blue}]);
+
+find_max_balls([], MaxBalls) ->
+	MaxBalls;
+
+find_max_balls(Balls, MaxBalls) ->
+	[{Count, Type}|OtherBalls] = Balls,
+	{MaxValue,_} = lists:keyfind(Type, 2, MaxBalls),
+	NewMaxBalls = if
+			      Count > MaxValue ->
+				      lists:keyreplace(Type, 2, MaxBalls, {Count, Type});
+			      true ->
+				      MaxBalls
+		      end,
+	find_max_balls(OtherBalls, NewMaxBalls).
+
 process_lines(Device, Acc, first_part) ->
 	case io:get_line(Device, "") of
 		eof -> Acc;
@@ -83,6 +106,18 @@ process_lines(Device, Acc, first_part) ->
 			  Device,
 			  Acc+GameValue,
 			  first_part
+			 )
+	end;
+
+process_lines(Device, Acc, second_part) ->
+	case io:get_line(Device, "") of
+		eof -> Acc;
+		Line ->
+			GameValue = game_value2(parse_line(string:chomp(Line))),
+			process_lines(
+			  Device,
+			  Acc+GameValue,
+			  second_part
 			 )
 	end.
 
