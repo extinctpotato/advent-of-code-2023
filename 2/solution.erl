@@ -67,18 +67,18 @@ parse_line(Line) ->
 	Sets = parse_sets(Tail),
 	{Game, Sets}.
 
-game_value(ParsedLine) ->
-	{Game, Sets} = ParsedLine,
+game_value({Game, Sets}) ->
 	case possible_sets(Sets) of
 		false -> 0;
 		true -> Game
 	end.
 
-game_value2(ParsedLine) ->
-	{_, Sets} = ParsedLine,
-	AllBalls = lists:flatten(Sets),
-	MaxSets = [M || {M,_} <- find_max_balls(AllBalls, [])],
-	lists:foldl(fun(X, Prod) -> X * Prod end, 1, MaxSets).
+game_value2({_, Sets}) ->
+	lists:foldl(
+	  fun(X, Prod) -> X * Prod end, 
+	  1, 
+	  [M || {M,_} <- find_max_balls(lists:flatten(Sets), [])]
+	 ).
 
 find_max_balls(Balls, []) ->
 	find_max_balls(Balls, [{0,red},{0,green},{0,blue}]);
@@ -86,8 +86,7 @@ find_max_balls(Balls, []) ->
 find_max_balls([], MaxBalls) ->
 	MaxBalls;
 
-find_max_balls(Balls, MaxBalls) ->
-	[{Count, Type}|OtherBalls] = Balls,
+find_max_balls([{Count, Type}|OtherBalls], MaxBalls) ->
 	{MaxValue,_} = lists:keyfind(Type, 2, MaxBalls),
 	NewMaxBalls = if
 			      Count > MaxValue ->
