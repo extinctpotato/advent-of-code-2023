@@ -2,8 +2,11 @@
 -compile(export_all).
 -include_lib("eunit/include/eunit.hrl").
 
+number_indices(Line, [], [], _Index, true) ->
+	{Line, 0, []};
 number_indices(Line, Digits, Indices, _Index, true) ->
-	{Line, Digits, Indices};
+	{Int, []} = string:list_to_integer(Digits),
+	{Line, Int, Indices};
 number_indices([], Digits, Indices, Index, _Halt) ->
 	number_indices([], Digits, Indices, Index, true);
 number_indices(Line, Digits, Indices, Index, _Halt) ->
@@ -18,10 +21,10 @@ number_indices(Line, Digits, Indices, Index, _Halt) ->
 						     {false, T}
 				     end,
 			number_indices(Line2, Digits, Indices, Index2, Halt);
-		{Int, []} ->
+		{_Int, []} ->
 			number_indices(
 			  T,
-			  lists:append(Digits, [Int]),
+			  lists:append(Digits, [H]),
 			  lists:append(Indices, [Index2]),
 			  Index2,
 			  false
