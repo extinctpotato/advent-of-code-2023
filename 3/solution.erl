@@ -49,3 +49,18 @@ all_number_indices(Line, NumberPairs, Offset) ->
 	end.
 all_number_indices(Line) ->
 	all_number_indices(Line, [], 0).
+
+% A symbol is anything that is not a dot and not an integer.
+is_symbol([$.]) -> false;
+is_symbol(S) ->
+	case string:to_integer(S) of
+		{error, _} -> true;
+		{_, _} -> false
+	end.
+
+symbol_in_indices(_Line, []) -> false;
+symbol_in_indices(Line, [Index|Indices]) ->
+	case is_symbol([lists:nth(Index, Line)]) of
+		true -> true;
+		false -> symbol_in_indices(Line, Indices)
+	end.
