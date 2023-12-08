@@ -30,5 +30,22 @@ number_indices(Line, Digits, Indices, Index, _Halt) ->
 			  false
 			 )
 	end.
-number_indices(Line) ->
-	number_indices(Line, [], [], 0, false). 
+number_indices(Line, Offset) ->
+	number_indices(Line, [], [], Offset, false). 
+
+all_number_indices([], NumberPairs, _Offset) ->
+	NumberPairs;
+all_number_indices(Line, NumberPairs, Offset) ->
+	{Line2, Int, Indices} = number_indices(Line, Offset),
+	case {Int, Indices} of
+		{0, []} ->
+			all_number_indices(Line2, NumberPairs, Offset);
+		{_, _} ->
+			all_number_indices(
+			  Line2, 
+			  lists:append(NumberPairs, [{Int, Indices}]),
+			  lists:last(Indices)
+			 )
+	end.
+all_number_indices(Line) ->
+	all_number_indices(Line, [], 0).
