@@ -58,6 +58,7 @@ is_symbol(S) ->
 		{_, _} -> false
 	end.
 
+symbol_in_indices([], _Indices) -> false;
 symbol_in_indices(_Line, []) -> false;
 symbol_in_indices(Line, [Index|Indices]) ->
 	case is_symbol([lists:nth(Index, Line)]) of
@@ -89,7 +90,7 @@ part_numbers(_PreviousLine, _Line, _NextLine, [], Numbers) ->
 	Numbers;
 part_numbers(PreviousLine, Line, NextLine, ToProcess, Numbers) ->
 	[{Number, Indices}|T] = ToProcess,
-	Predicate = fun(E) -> symbol_in_indices(E, Indices) end,
+	Predicate = fun(E) -> symbol_in_indices(E, surround(Indices, length(Line))) end,
 	Numbers2 = case lists:any(Predicate, [PreviousLine, Line, NextLine]) of
 			   true -> lists:append([Number], Numbers);
 			   false -> Numbers
@@ -98,3 +99,23 @@ part_numbers(PreviousLine, Line, NextLine, ToProcess, Numbers) ->
 
 part_numbers(PreviousLine, Line, NextLine) ->
 	part_numbers(PreviousLine, Line, NextLine, all_number_indices(Line), []).
+
+%%%
+
+process_lines(_Device, Acc, _Line1, []) ->
+	Acc;
+process_lines(Device, Acc, Line1, Line2) ->
+	Line3 = case io:get_line(Device, "") of
+			eof -> [];
+			Line -> Line
+		end,
+	Acc2 = Acc + lists:sum(part_numbers(Line1, Line2, Line3)),
+	process_lines(Device, Acc2, Line2, Line3).
+
+process_lines(Device, Acc) ->
+	Line = io:get_line(Device, ""),
+	process_lines(Device, Acc, [], Line).
+
+process_file(Path) ->
+        {_, Device} = file:open(Path, [read]),
+        process_lines(Device, 0).
