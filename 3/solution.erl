@@ -83,6 +83,8 @@ rsurround([], _Max) -> [];
 rsurround(List, Max) ->
 	rsurround(List, Max, length(List)).
 
+surround(List, Max) -> lsurround(rsurround(List, Max)).
+
 part_numbers(_PreviousLine, _Line, _NextLine, [], Numbers) ->
 	Numbers;
 part_numbers(PreviousLine, Line, NextLine, ToProcess, Numbers) ->
