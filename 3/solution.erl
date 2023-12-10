@@ -65,6 +65,24 @@ symbol_in_indices(Line, [Index|Indices]) ->
 		false -> symbol_in_indices(Line, Indices)
 	end.
 
+lsurround([]) -> [];
+lsurround(List) ->
+	Prefix = lists:nth(1, List) - 1,
+	if
+		Prefix > 0 ->
+			lists:append([Prefix], List);
+		true ->
+			List
+	end.
+
+rsurround(List, Max, Max) ->
+	List;
+rsurround(List, _Max, _Length) ->
+	lists:append(List, [lists:nth(length(List), List)+1]).
+rsurround([], _Max) -> [];
+rsurround(List, Max) ->
+	rsurround(List, Max, length(List)).
+
 part_numbers(_PreviousLine, _Line, _NextLine, [], Numbers) ->
 	Numbers;
 part_numbers(PreviousLine, Line, NextLine, ToProcess, Numbers) ->
