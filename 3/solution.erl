@@ -64,3 +64,17 @@ symbol_in_indices(Line, [Index|Indices]) ->
 		true -> true;
 		false -> symbol_in_indices(Line, Indices)
 	end.
+
+part_numbers(_PreviousLine, _Line, _NextLine, [], Numbers) ->
+	Numbers;
+part_numbers(PreviousLine, Line, NextLine, ToProcess, Numbers) ->
+	[{Number, Indices}|T] = ToProcess,
+	Predicate = fun(E) -> symbol_in_indices(E, Indices) end,
+	Numbers2 = case lists:any(Predicate, [PreviousLine, Line, NextLine]) of
+			   true -> lists:append([Number], Numbers);
+			   false -> Numbers
+		   end,
+	part_numbers(PreviousLine, Line, NextLine, T, Numbers2).
+
+part_numbers(PreviousLine, Line, NextLine) ->
+	part_numbers(PreviousLine, Line, NextLine, all_number_indices(Line), []).
