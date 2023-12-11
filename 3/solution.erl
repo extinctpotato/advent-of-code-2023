@@ -51,6 +51,7 @@ all_number_indices(Line) ->
 	all_number_indices(Line, [], 0).
 
 % A symbol is anything that is not a dot and not an integer.
+is_symbol([]) -> false;
 is_symbol([$.]) -> false;
 is_symbol(S) ->
 	case string:to_integer(S) of
@@ -71,20 +72,23 @@ lsurround(List) ->
 	Prefix = lists:nth(1, List) - 1,
 	if
 		Prefix > 0 ->
-			lists:append([Prefix], List);
+			[Prefix];
 		true ->
-			List
+			[]
 	end.
 
-rsurround(List, Max, Max) ->
-	List;
-rsurround(List, _Max, _Length) ->
-	lists:append(List, [lists:nth(length(List), List)+1]).
 rsurround([], _Max) -> [];
 rsurround(List, Max) ->
-	rsurround(List, Max, length(List)).
+	Suffix = lists:nth(length(List), List) + 1,
+	if
+		Suffix > Max ->
+			[];
+		true ->
+			[Suffix]
+	end.
 
-surround(List, Max) -> lsurround(rsurround(List, Max)).
+surround(List, Max) ->
+	lists:append(lists:append(lsurround(List), List), rsurround(List, Max)).
 
 part_numbers(_PreviousLine, _Line, _NextLine, [], Numbers) ->
 	Numbers;
@@ -107,13 +111,13 @@ process_lines(_Device, Acc, _Line1, []) ->
 process_lines(Device, Acc, Line1, Line2) ->
 	Line3 = case io:get_line(Device, "") of
 			eof -> [];
-			Line -> Line
+			Line -> string:chomp(Line)
 		end,
 	Acc2 = Acc + lists:sum(part_numbers(Line1, Line2, Line3)),
 	process_lines(Device, Acc2, Line2, Line3).
 
 process_lines(Device, Acc) ->
-	Line = io:get_line(Device, ""),
+	Line = string:chomp(io:get_line(Device, "")),
 	process_lines(Device, Acc, [], Line).
 
 process_file(Path) ->
