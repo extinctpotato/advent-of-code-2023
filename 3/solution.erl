@@ -50,6 +50,20 @@ all_number_indices(Line, NumberPairs, Offset) ->
 all_number_indices(Line) ->
 	all_number_indices(Line, [], 0).
 
+all_symbol_indices([], Indices, _Index) ->
+	Indices;
+all_symbol_indices([Char|Line], Indices, Index) ->
+	all_symbol_indices(
+	  Line,
+	  case is_symbol([Char]) of
+		  true -> lists:append(Indices, [Index]);
+		  false -> Indices
+	  end,
+	  Index+1
+	 ).
+all_symbol_indices(Line) ->
+	all_symbol_indices(Line, [], 1).
+
 % A symbol is anything that is not a dot and not an integer.
 is_symbol([]) -> false;
 is_symbol([$.]) -> false;
