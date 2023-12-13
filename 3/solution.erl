@@ -104,6 +104,21 @@ rsurround(List, Max) ->
 surround(List, Max) ->
 	lists:append(lists:append(lsurround(List), List), rsurround(List, Max)).
 
+gears(_SymbolIndex, [], Gears) ->
+	Gears;
+gears(SymbolIndex, [{Number, Indices}|Pairs], Gears) ->
+	gears(
+	  SymbolIndex,
+	  Pairs,
+	  case lists:member(SymbolIndex, Indices) of
+		  true -> [Number|Gears];
+		  false -> Gears
+	  end
+	 ).
+
+gears(SymbolIndex, NumberPairs) ->
+	gears(SymbolIndex, NumberPairs, []).
+
 part_numbers(_PreviousLine, _Line, _NextLine, [], Numbers) ->
 	Numbers;
 part_numbers(PreviousLine, Line, NextLine, ToProcess, Numbers) ->
@@ -117,6 +132,28 @@ part_numbers(PreviousLine, Line, NextLine, ToProcess, Numbers) ->
 
 part_numbers(PreviousLine, Line, NextLine) ->
 	part_numbers(PreviousLine, Line, NextLine, all_number_indices(Line), []).
+
+%%% Tests
+
+gears_test_() ->
+	Line1 = "467..114..",
+	Line2 = "...*......",
+	Line3 = "..35..633.",
+	Pairs = lists:flatten(lists:map(
+		  fun(L) -> lists:map(
+			      fun({N,I}) -> {N, surround(I, length(L))} end,
+			      all_number_indices(L)
+			     )
+		  end,
+		  [Line1, Line2, Line3]
+		 )),
+	FirstSymbol = lists:nth(1, all_symbol_indices(Line2)),
+	Gears = gears(FirstSymbol, Pairs),
+	[?_assert(FirstSymbol =:= 4),
+	 ?_assert(length(Gears) =:= 2),
+	 ?_assert(lists:nth(1, Gears) =:= 35),
+	 ?_assert(lists:nth(2, Gears) =:= 467)
+	].
 
 %%%
 
