@@ -129,6 +129,25 @@ gears(SymbolIndex, [{Number, Indices}|Pairs], Gears) ->
 gears(SymbolIndex, NumberPairs) ->
 	gears(SymbolIndex, NumberPairs, []).
 
+gear_ratios2(_Pairs, [], Ratios) ->
+	Ratios;
+gear_ratios2(Pairs, [SymbolIndex|SymbolIndices], Ratios) ->
+	gear_ratios2(
+	  Pairs,
+	  SymbolIndices,
+	  case gears(SymbolIndex, Pairs) of
+		  [Gear1,Gear2] -> [Gear1 * Gear2|Ratios];
+		  [] -> Ratios
+	  end
+	 ).
+
+gear_ratios(PreviousLine, Line, NextLine) ->
+	gear_ratios2(
+	  surrounded_pairs([PreviousLine, Line, NextLine]), 
+	  all_symbol_indices(Line),
+	  []
+	 ). 
+
 part_numbers(_PreviousLine, _Line, _NextLine, [], Numbers) ->
 	Numbers;
 part_numbers(PreviousLine, Line, NextLine, ToProcess, Numbers) ->
@@ -152,10 +171,12 @@ gears_test_() ->
 	Pairs = surrounded_pairs([Line1, Line2, Line3]),
 	FirstSymbol = lists:nth(1, all_symbol_indices(Line2)),
 	Gears = gears(FirstSymbol, Pairs),
+	GearRatios = gear_ratios(Line1, Line2, Line3),
 	[?_assert(FirstSymbol =:= 4),
 	 ?_assert(length(Gears) =:= 2),
 	 ?_assert(lists:nth(1, Gears) =:= 35),
-	 ?_assert(lists:nth(2, Gears) =:= 467)
+	 ?_assert(lists:nth(2, Gears) =:= 467),
+	 ?_assert(lists:nth(1, GearRatios) =:= 16345)
 	].
 
 %%%
