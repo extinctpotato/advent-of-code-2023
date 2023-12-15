@@ -104,8 +104,18 @@ rsurround(List, Max) ->
 surround(List, Max) ->
 	lists:append(lists:append(lsurround(List), List), rsurround(List, Max)).
 
-gears(_SymbolIndex, [], Gears) ->
-	Gears;
+surrounded_pairs(Lines) ->
+	lists:flatten(lists:map(
+			fun(L) -> lists:map(
+				    fun({N,I}) -> {N, surround(I, length(L))} end,
+				    all_number_indices(L)
+				   )
+			end,
+			Lines
+		       )).
+
+gears(_SymbolIndex, [], [Gear1,Gear2]) ->
+	[Gear1,Gear2];
 gears(SymbolIndex, [{Number, Indices}|Pairs], Gears) ->
 	gears(
 	  SymbolIndex,
@@ -139,14 +149,7 @@ gears_test_() ->
 	Line1 = "467..114..",
 	Line2 = "...*......",
 	Line3 = "..35..633.",
-	Pairs = lists:flatten(lists:map(
-		  fun(L) -> lists:map(
-			      fun({N,I}) -> {N, surround(I, length(L))} end,
-			      all_number_indices(L)
-			     )
-		  end,
-		  [Line1, Line2, Line3]
-		 )),
+	Pairs = surrounded_pairs([Line1, Line2, Line3]),
 	FirstSymbol = lists:nth(1, all_symbol_indices(Line2)),
 	Gears = gears(FirstSymbol, Pairs),
 	[?_assert(FirstSymbol =:= 4),
