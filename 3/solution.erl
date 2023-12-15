@@ -181,6 +181,12 @@ gears_test_() ->
 	 ?_assert(lists:nth(1, GearRatios) =:= 16345)
 	].
 
+input_test_() ->
+	Path = "input.txt",
+	[?_assert(process_file(Path, first_part) =:= 527364),
+	 ?_assert(process_file(Path, second_part) =:= 79026871)
+	].
+
 %%%
 
 process_lines(_Device, Acc, _Line1, [], _Fun) ->
