@@ -114,6 +114,8 @@ surrounded_pairs(Lines) ->
 			Lines
 		       )).
 
+gears(_SymbolIndex, [], [_Gear1]) ->
+	[];
 gears(_SymbolIndex, [], [Gear1,Gear2]) ->
 	[Gear1,Gear2];
 gears(SymbolIndex, [{Number, Indices}|Pairs], Gears) ->
@@ -181,20 +183,27 @@ gears_test_() ->
 
 %%%
 
-process_lines(_Device, Acc, _Line1, []) ->
+process_lines(_Device, Acc, _Line1, [], _Fun) ->
 	Acc;
-process_lines(Device, Acc, Line1, Line2) ->
+process_lines(Device, Acc, Line1, Line2, Fun) ->
 	Line3 = case io:get_line(Device, "") of
 			eof -> [];
 			Line -> string:chomp(Line)
 		end,
-	Acc2 = Acc + lists:sum(part_numbers(Line1, Line2, Line3)),
-	process_lines(Device, Acc2, Line2, Line3).
+	Acc2 = Acc + lists:sum(Fun(Line1, Line2, Line3)),
+	process_lines(Device, Acc2, Line2, Line3, Fun).
 
-process_lines(Device, Acc) ->
+process_lines(Device, Acc, Fun) ->
 	Line = string:chomp(io:get_line(Device, "")),
-	process_lines(Device, Acc, [], Line).
+	process_lines(Device, Acc, [], Line, Fun).
 
-process_file(Path) ->
+process_file(Path, TaskPart) ->
         {_, Device} = file:open(Path, [read]),
-        process_lines(Device, 0).
+        process_lines(
+	  Device,
+	  0,
+	  case TaskPart of
+		  first_part -> fun(L1,L2,L3) -> part_numbers(L1, L2, L3) end;
+		  second_part -> fun(L1,L2,L3) -> gear_ratios(L1, L2, L3) end
+	  end
+	 ).
