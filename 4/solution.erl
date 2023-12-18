@@ -14,7 +14,7 @@ parse_numbers(String) ->
 
 parse_line(Line) ->
 	[CardL,Numbers] = string:split(Line, ": "),
-	Card = list_to_integer(lists:last(string:split(CardL, "Card "))),
+	Card = list_to_integer(string:trim(lists:last(string:split(CardL, "Card ")))),
 	[Winning, Ours] = lists:map(
 			    fun(E) -> parse_numbers(E) end,
 			    string:split(Numbers, " | ")
