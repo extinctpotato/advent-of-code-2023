@@ -48,3 +48,18 @@ line_value_test_() ->
 		 {"Card 7: 31  4  5 56 72 | 74 77 10  4  5 67 36 11", 2}
 		],
 	[?_assert(line_value(L) == V) || {L,V} <- Cases].
+
+%%% File processing
+
+process_lines(Device, Acc) ->
+	case io:get_line(Device, "") of
+		eof -> Acc;
+		L ->
+			Value = line_value(string:chomp(L)),
+			io:fwrite("L: ~p, V: ~p\n", [L, Value]),
+			process_lines(Device, Acc + Value)
+	end.
+
+process_file(Path) ->
+	{_, Device} = file:open(Path, [read]),
+	process_lines(Device, 0).
