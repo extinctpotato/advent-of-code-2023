@@ -49,6 +49,9 @@ line_value_test_() ->
 		],
 	[?_assert(line_value(L) == V) || {L,V} <- Cases].
 
+process_file_test_() ->
+	[?_assert(process_file("input2.txt") == 13)].
+
 %%% File processing
 
 process_lines(Device, Acc) ->
