@@ -4,7 +4,7 @@
 
 whitespace_split(String) ->
 	{ok, R} = re:compile("\\s+"),
-	re:split(String, R, [{return,list}]).
+	[X || X <- re:split(String, R, [{return,list}]), length(X) > 0].
 
 parse_numbers(String) ->
 	lists:map(
