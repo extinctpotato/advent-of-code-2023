@@ -59,7 +59,6 @@ process_lines(Device, Acc) ->
 		eof -> Acc;
 		L ->
 			Value = line_value(string:chomp(L)),
-			io:fwrite("L: ~p, V: ~p\n", [L, Value]),
 			process_lines(Device, Acc + Value)
 	end.
 
