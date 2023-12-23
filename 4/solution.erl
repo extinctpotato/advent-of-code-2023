@@ -38,6 +38,8 @@ won_copies(Line) ->
 		Matching -> lists:seq(Number+1, Number+Matching)
 	end.
 
+
+
 %%% Tests
 
 sample_line_cases() ->
@@ -49,6 +51,9 @@ sample_line_cases() ->
 	 {"Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11", 0, []},
 	 {"Card 7: 31  4  5 56 72 | 74 77 10  4  5 67 36 11", 2, [8,9]}
 	].
+
+sample_original_cards() ->
+	original_cards([L || {L,_,_} <- sample_line_cases()], lines).
 
 parser_test_() ->
 	Line = "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53",
@@ -68,6 +73,17 @@ won_copies_test_() ->
 	[?_assert(won_copies(L) =:= V) || {L,_,V} <- sample_line_cases()].
 
 %%% File processing
+
+original_cards(Device, device, Cards) ->
+	case io:get_line(Device, "") of
+		eof -> lists:reverse(Cards);
+		Line -> original_cards(Device, device, [won_copies(Line)|Cards])
+	end.
+
+original_cards(Lines, lines) ->
+	lists:map(fun(L) -> won_copies(L) end, Lines);
+original_cards(Device, device) ->
+	original_cards(Device, device, []).
 
 process_lines(Device, Acc) ->
 	case io:get_line(Device, "") of
