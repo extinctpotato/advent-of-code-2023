@@ -24,11 +24,31 @@ parse_line(Line) ->
 scratchcard_value(0) -> 0;
 scratchcard_value(Length) -> math:pow(2, Length-1).
 
+matching_numbers(List1, List2) ->
+	length([X || X <- List1, Y <- List2, X =:= Y]).
+
 line_value(Line) ->
 	{_, Winning, Ours} = parse_line(Line),
-	scratchcard_value(length([X || X <- Winning, Y <- Ours, X =:= Y])).
+	scratchcard_value(matching_numbers(Winning, Ours)).
+
+won_copies(Line) ->
+	{Number, Winning, Ours} = parse_line(Line),
+	case matching_numbers(Winning, Ours) of
+		0 -> [];
+		Matching -> lists:seq(Number+1, Number+Matching)
+	end.
 
 %%% Tests
+
+sample_line_cases() ->
+	[{"Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53", 8, [2,3,4,5]},
+	 {"Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19", 2, [3,4]},
+	 {"Card 3:  1 21 53 59 44 | 69 82 63 72 16 21 14  1", 2, [4,5]},
+	 {"Card 4: 41 92 73 84 69 | 59 84 76 51 58  5 54 83", 1, [5]},
+	 {"Card 5: 87 83 26 28 32 | 88 30 70 12 93 22 82 36", 0, []},
+	 {"Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11", 0, []},
+	 {"Card 7: 31  4  5 56 72 | 74 77 10  4  5 67 36 11", 2, [8,9]}
+	].
 
 parser_test_() ->
 	Line = "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53",
@@ -39,18 +59,13 @@ parser_test_() ->
 	].
 
 line_value_test_() ->
-	Cases = [{"Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53", 8},
-		 {"Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19", 2},
-		 {"Card 3:  1 21 53 59 44 | 69 82 63 72 16 21 14  1", 2},
-		 {"Card 4: 41 92 73 84 69 | 59 84 76 51 58  5 54 83", 1},
-		 {"Card 5: 87 83 26 28 32 | 88 30 70 12 93 22 82 36", 0},
-		 {"Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11", 0},
-		 {"Card 7: 31  4  5 56 72 | 74 77 10  4  5 67 36 11", 2}
-		],
-	[?_assert(line_value(L) == V) || {L,V} <- Cases].
+	[?_assert(line_value(L) == V) || {L,V,_} <- sample_line_cases()].
 
 process_file_test_() ->
 	[?_assert(process_file("input2.txt") == 13)].
+
+won_copies_test_() ->
+	[?_assert(won_copies(L) =:= V) || {L,_,V} <- sample_line_cases()].
 
 %%% File processing
 
