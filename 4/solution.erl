@@ -38,7 +38,25 @@ won_copies(Line) ->
 		Matching -> lists:seq(Number+1, Number+Matching)
 	end.
 
+won_scratchcards(_LeftElement, [], _Originals, Acc) ->
+	Acc;
+won_scratchcards(LeftElement, RightElements, Originals, Acc) ->
+	case lists:nth(LeftElement, Originals) of % these are new won cards
+		[] -> % go back to the non-LHS of the tree
+			[NewLeft|NewRight] = RightElements,
+			won_scratchcards(NewLeft, NewRight, Originals, Acc);
+		List ->
+			[NewLeft|PrependRight] = List,
+			won_scratchcards(
+			  NewLeft,
+			  lists:append(PrependRight, RightElements),
+			  Originals,
+			  Acc+1
+			 )
+	end.
 
+won_scratchcards(Card, Originals) ->
+	won_scratchcards(Card, lists:nth(Card, Originals), Originals, 1).
 
 %%% Tests
 
