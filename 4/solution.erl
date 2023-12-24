@@ -103,6 +103,15 @@ original_cards(Lines, lines) ->
 original_cards(Device, device) ->
 	original_cards(Device, device, []).
 
+process_lines2(Device) ->
+	Originals = original_cards(Device, device),
+	lists:sum(
+	  lists:map(
+	    fun(C) -> won_scratchcards(C, Originals) end,
+	    lists:seq(1, length(Originals))
+	   )
+	 ).
+
 process_lines(Device, Acc) ->
 	case io:get_line(Device, "") of
 		eof -> Acc;
@@ -110,6 +119,10 @@ process_lines(Device, Acc) ->
 			Value = line_value(string:chomp(L)),
 			process_lines(Device, Acc + Value)
 	end.
+
+process_file2(Path) ->
+	{_, Device} = file:open(Path, [read]),
+	process_lines2(Device).
 
 process_file(Path) ->
 	{_, Device} = file:open(Path, [read]),
