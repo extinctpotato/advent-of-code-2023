@@ -77,7 +77,7 @@ won_copies_test_() ->
 original_cards(Device, device, Cards) ->
 	case io:get_line(Device, "") of
 		eof -> lists:reverse(Cards);
-		Line -> original_cards(Device, device, [won_copies(Line)|Cards])
+		Line -> original_cards(Device, device, [won_copies(string:chomp(Line))|Cards])
 	end.
 
 original_cards(Lines, lines) ->
