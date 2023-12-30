@@ -23,10 +23,11 @@ parse_map_header(Line) ->
 		{match, [Line, Source, Destination]} -> {Source, Destination}
 	end.
 
-parse_line(Line, {[],[]}) -> {parse_seeds(Line), []}; % parse first line
-parse_line("", {S,[]}) -> {S, []};                    % parse second line
+parse_line(Line, {[],[]}, []) -> {parse_seeds(Line), [], []}; % parse first line
+parse_line("", {Seeds, Maps}, _Acc) -> {Seeds, Maps, []};     % parse empty line
+parse_line(Line, {Seeds, Maps}, []) -> {Seeds, Maps, [parse_map_header(Line)]};
 
-parse_line(Line, {_S, Maps}) ->
+parse_line(Line, {_S, Maps}, Acc) ->
 	Line. % TODO: implement
 
 process_lines(Device, Acc) ->
