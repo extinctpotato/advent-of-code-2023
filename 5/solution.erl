@@ -23,7 +23,8 @@ parse_map_header(Line) ->
 		{match, [Line, Source, Destination]} -> {Source, Destination}
 	end.
 
-parse_line(Line, {[],[]}, []) -> {parse_seeds(Line), [], []}; % parse first line
+parse_line(Line, {[],[]}, []) -> {parse_seeds(Line), [], []};  % parse first line
+parse_line("", {Seeds, []}, []) -> {Seeds, [], []};            % parse second line
 parse_line("", {Seeds, Maps}, Acc) -> {Seeds, [Acc|Maps], []}; % empty line
 parse_line(Line, {Seeds, Maps}, []) -> {Seeds, Maps, [parse_map_header(Line)]};
 
@@ -31,10 +32,12 @@ parse_line(Line, {Seeds, Maps}, Acc) ->
 	{Seeds, Maps, [parse_numbers(Line)|Acc]}.
 
 process_lines(Device, Acc) ->
+	{Seeds, Maps, LineAcc} = Acc,
 	case io:get_line(Device, "") of
-		eof -> Acc;
+		% parse_line/3 doesn't know that there are no more lines to chug
+		% so we have to simulate a bogus empty line to flush the line accumulator
+		eof -> parse_line("", {Seeds, Maps}, LineAcc);
 		L -> 
-			{Seeds, Maps, LineAcc} = Acc,
 			process_lines(
 			  Device, 
 			  parse_line(string:chomp(L), {Seeds,Maps}, LineAcc)
