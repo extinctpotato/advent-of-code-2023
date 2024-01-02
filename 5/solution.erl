@@ -5,10 +5,16 @@
 % Any source numbers that aren't mapped correspond to the same destination number.
 src2dest(N, []) -> N;
 % When in range, convert.
-src2dest(N, [[Dest, Source, Range]|_Maps]) when N >= Source, N < Source+Range ->
+src2dest(N, [[Dest, Source, Range]|_Ranges]) when N >= Source, N < Source+Range ->
 	Dest + N - Source;
 % Reject maps that do not cover the range where the number would fit.
-src2dest(N, [_NotInRange|Maps]) -> src2dest(N, Maps).
+src2dest(N, [_NotInRange|Ranges]) -> src2dest(N, Ranges).
+
+seed2location(N, []) -> N;
+seed2location(N, [[{_S, _D}|Ranges]|Maps]) ->
+	seed2location(src2dest(N, Ranges), Maps).
+
+seeds2locations(Seeds, Maps) -> lists:map(fun(S) -> seed2location(S, Maps) end, Seeds).
 
 parse_numbers(Line) ->
 	lists:map(
