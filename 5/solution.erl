@@ -2,6 +2,14 @@
 -compile(export_all).
 -include_lib("eunit/include/eunit.hrl").
 
+% Any source numbers that aren't mapped correspond to the same destination number.
+src2dest(N, []) -> N;
+% When in range, convert.
+src2dest(N, [[Dest, Source, Range]|_Maps]) when N >= Source, N < Source+Range ->
+	Dest + N - Source;
+% Reject maps that do not cover the range where the number would fit.
+src2dest(N, [_NotInRange|Maps]) -> src2dest(N, Maps).
+
 parse_numbers(Line) ->
 	lists:map(
 	  fun(E) -> case string:to_integer(E) of
