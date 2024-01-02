@@ -66,6 +66,10 @@ process_file(Path) ->
 	{_, Device} = file:open(Path, [read]),
 	process_lines(Device, {[],[],[]}).
 
+lowest_from_file(Path) ->
+	{Seeds, Maps} = process_file(Path),
+	lists:min(seeds2locations(Seeds, Maps)).
+
 %%% Tests
 
 parse_numbers_test_() ->
