@@ -25,7 +25,7 @@ parse_map_header(Line) ->
 
 parse_line(Line, {[],[]}, []) -> {parse_seeds(Line), [], []};  % parse first line
 parse_line("", {Seeds, []}, []) -> {Seeds, [], []};            % parse second line
-parse_line("", {Seeds, Maps}, Acc) -> {Seeds, [Acc|Maps], []}; % empty line
+parse_line("", {Seeds, Maps}, Acc) -> {Seeds, [lists:reverse(Acc)|Maps], []}; % empty line
 parse_line(Line, {Seeds, Maps}, []) -> {Seeds, Maps, [parse_map_header(Line)]};
 
 parse_line(Line, {Seeds, Maps}, Acc) ->
@@ -35,8 +35,12 @@ process_lines(Device, Acc) ->
 	{Seeds, Maps, LineAcc} = Acc,
 	case io:get_line(Device, "") of
 		% parse_line/3 doesn't know that there are no more lines to chug
-		% so we have to simulate a bogus empty line to flush the line accumulator
-		eof -> parse_line("", {Seeds, Maps}, LineAcc);
+		% so we have to simulate a bogus empty line to flush the line accumulator.
+		% Additionally, we reverse the maps list so that the order matches that
+		% of the file and we reject the (assumed to be empty) accumulator.
+		eof -> 
+			{Seeds2, Maps2, []} = parse_line("", {Seeds, Maps}, LineAcc),
+			{Seeds2, lists:reverse(Maps2)};
 		L -> 
 			process_lines(
 			  Device, 
