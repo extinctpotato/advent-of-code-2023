@@ -16,6 +16,17 @@ seed2location(N, [[{_S, _D}|Ranges]|Maps]) ->
 
 seeds2locations(Seeds, Maps) -> lists:map(fun(S) -> seed2location(S, Maps) end, Seeds).
 
+generate_seeds([], Acc) -> Acc;
+generate_seeds([Start,Length|OtherSeeds], Acc) ->
+	generate_seeds(
+	  OtherSeeds,
+	  lists:append(
+	    Acc,
+	    lists:seq(Start, Start+Length-1)
+	   )
+	 ).
+generate_seeds(Seeds) -> generate_seeds(Seeds, []).
+
 parse_numbers(Line) ->
 	lists:map(
 	  fun(E) -> case string:to_integer(E) of
@@ -69,6 +80,10 @@ process_file(Path) ->
 lowest_from_file(Path) ->
 	{Seeds, Maps} = process_file(Path),
 	lists:min(seeds2locations(Seeds, Maps)).
+
+lowest_from_file2(Path) ->
+	{Seeds, Maps} = process_file(Path),
+	lists:min(seeds2locations(generate_seeds(Seeds), Maps)).
 
 %%% Tests
 
