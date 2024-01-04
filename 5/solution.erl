@@ -27,6 +27,14 @@ generate_seeds([Start,Length|OtherSeeds], Acc) ->
 	 ).
 generate_seeds(Seeds) -> generate_seeds(Seeds, []).
 
+sr2ll(Current, UpTo, Maps, Min) when Current < UpTo ->
+	sr2ll(Current+1, UpTo, Maps, min(Min, seed2location(Current, Maps)));
+sr2ll(_Current, _UpTo, _Maps, Min) -> Min.
+
+% Take a (s)eed (r)ange and convert it to the (l)owest (l)ocation.
+sr2ll([Start,Length], Maps) -> 
+	sr2ll(Start, Start+Length-1, Maps, seed2location(Start, Maps)).
+
 parse_numbers(Line) ->
 	lists:map(
 	  fun(E) -> case string:to_integer(E) of
