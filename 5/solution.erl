@@ -35,6 +35,13 @@ sr2ll(_Current, _UpTo, _Maps, Min) -> Min.
 sr2ll([Start,Length], Maps) -> 
 	sr2ll(Start, Start+Length-1, Maps, seed2location(Start, Maps)).
 
+srs2ll([], _Maps, Min) -> Min;
+srs2ll([Start,Length|OtherSeeds], Maps, Min) ->
+	srs2ll(OtherSeeds, Maps, min(Min, sr2ll([Start, Length], Maps))).
+
+srs2ll([Start,Length|OtherSeeds], Maps) -> 
+	srs2ll(OtherSeeds, Maps, sr2ll([Start,Length], Maps)).
+
 parse_numbers(Line) ->
 	lists:map(
 	  fun(E) -> case string:to_integer(E) of
@@ -91,7 +98,7 @@ lowest_from_file(Path) ->
 
 lowest_from_file2(Path) ->
 	{Seeds, Maps} = process_file(Path),
-	lists:min(seeds2locations(generate_seeds(Seeds), Maps)).
+	srs2ll(Seeds, Maps).
 
 %%% Tests
 
