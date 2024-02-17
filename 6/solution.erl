@@ -19,3 +19,8 @@ ways_to_win({Time, Distance}, HoldFor, Ways) ->
 
 ways_to_win(Race) ->
 	ways_to_win(Race, 0, 0).
+
+margin_of_error([], Acc) -> Acc;
+margin_of_error([Race|Races], Acc) -> margin_of_error(Races, Acc*ways_to_win(Race)).
+
+margin_of_error(Races) -> margin_of_error(Races, 1).
