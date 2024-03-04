@@ -29,7 +29,8 @@ margin_of_error(Races) -> margin_of_error(Races, 1).
 
 leading_number_terminal(R, Digits) ->
 	case string:to_integer(string:reverse(Digits)) of
-		{Int, []} -> {Int, R}
+		{Int, []} -> {Int, R};
+		{Int, "\n"} -> {Int, []} % An awful hack for nl-terminated lines
 	end.
 leading_number([32|R], []) -> leading_number(R, []);
 leading_number([32|R], Digits) -> leading_number_terminal(R, Digits);
