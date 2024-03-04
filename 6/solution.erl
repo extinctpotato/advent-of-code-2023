@@ -47,3 +47,8 @@ parse_line([Title, Numbers]) ->
 	{list_to_atom(string:lowercase(Title)), leading_number_all(Numbers)};
 parse_line(Line) ->
 	parse_line(string:split(Line, ":")).
+
+race([{time, []}, {distance, []}], R) -> R;
+race([{time, [Time|R1]}, {distance, [Distance|R2]}], R) ->
+	race([{time, R1}, {distance, R2}], [{Time, Distance}|R]).
+race(ParsedLines) -> race(ParsedLines, []).
